@@ -8,7 +8,7 @@ Nesta atualização utilizei o método de dats para adicionar algumas funções,
 
 Atualização 3
 
-Nesta atualização estava tentanco criar um cadastro para cliente ainda sem banco de dados, criando uma função para caastrar clientes e criar contas, mas ainda não esta de uma maneira funcional e nem as contas relacioandas as transações
+Nesta atualização estava tentanco criar um cadastro para cliente ainda sem banco de dados, criando uma função para cadastrar clientes e criar contas, mas ainda não esta de uma maneira funcional e nem as contas relacioandas as transações
 
 Atualização 4
 
