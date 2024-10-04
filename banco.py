@@ -1,7 +1,60 @@
-import datetime
 import os
+import datetime
+import getpass
 
 formatador = ("%d/%m/%Y %H:%M:%S")
+
+cpfs = []
+conta = {}
+data_atual = datetime.datetime.now()
+numero_conta = 10000
+
+def numero_contas():
+    global numero_conta
+    numero_conta += 1
+    return numero_conta
+
+def cancelar_numero_contas():
+    global numero_conta
+    numero_conta -= 1
+
+def telafinal():
+    print(f"""
+          Obrigado por utilizar o nosso Banco
+                   Volte Sempre!!!
+          """)
+
+def teste_operacao():
+    operacao = input("Digite o numero da operação desejada: \n")
+    if operacao.isdigit():
+        operacao = int(operacao)
+        return operacao 
+    else:
+        operacao = 9
+        return operacao
+    
+def testar_resp(resp):
+    if len(resp) > 0:
+        resp = resp.strip().capitalize()
+        return resp[0]
+    else:
+        return "f"
+    
+def telainicial(data):
+    print(f"""
+    --------------Bem vindo ao seu Banco--------------
+          
+                    {(data_atual.strftime(formatador))}
+
+           Por favor digite a operação desejada:
+
+      1 - Cadastrar novo usuario
+      2 - Cadastrar nova conta
+      3 - Operações
+      4 - Sair
+
+    --------------------------------------------------
+      """)
 
 def teste_cpf():
     while True:
@@ -18,466 +71,541 @@ def teste_cpf():
             os.system('cls')
             print("CPF invalido, o CPF deve possuir 11 numeros")
 
-def teste_operacao():
-    operacao = input("Digite o numero da operação desejada: \n")
-    if operacao.isdigit():
-        operacao = int(operacao)
-        return operacao 
-    else:
-        operacao = 9
-        return operacao
+class Usuario:
     
-def teste_nome():
-    while True:    
-        nome = input("Digite o seu nome completo: \n")
-        os.system('cls')
-        nome = nome.strip()
-        nome = nome.split(" ")
-        if len(nome) < 2:
-            os.system('cls')
-            print("Nome invalido, por favor digite seu nome completo, não apenas o primeiro nome")
-        else:
-            os.system('cls')
-            nome = " ".join(nome)
-            return nome
+    usuarios_cadastrados = []
     
-def teste_nascimento():
-    while True:
-        data_nascimento = input("Digite a sua data de nascimento: [xx/yy/zz] \n")
-        os.system('cls')
-        if "/" not in data_nascimento:
-            dia = data_nascimento[:2]
-            mes = data_nascimento[2:4]
-            ano = data_nascimento[4:]
-            data_nascimento = "/".join([dia, mes, ano])
-        data_nascimento = data_nascimento.split("/")
-        c = 0
-        if len(data_nascimento) == 3: 
-            if int(data_nascimento[0]) <= 31 and int(data_nascimento[0]) > 0:
+    def __init__(self, nome, data_nascimento, endereco, cpf):
+        self.nome = nome
+        self.data_nascimento = data_nascimento
+        self.endereco = endereco
+        self.cpf = cpf
+        cpfs.append(self.cpf)
+        Usuario.usuarios_cadastrados.append(self)
+     
+    @staticmethod
+    def tela_alterar_dados(data):
+        print(f"""
+        -----------------Bem vindo ao seu Banco-----------------
+            
+                        {(data_atual.strftime(formatador))}
+
+        Por favor digite o numero do dado que deseja modificar:
+
+        1 - Nome
+        2 - Data de Nascimento
+        3 - CPF
+        4 - Endereço
+        5 - Sair
+
+        --------------------------------------------------------
+        """)
+            
+    @staticmethod
+    def teste_endereco():
+        while True:
+            logradouro = input("Digite o nome da sua rua: \n")
+            logradouro = logradouro.strip()
+            logradouro = logradouro.split(" ")
+            if len(logradouro) < 2:
+                os.system('cls')
+                print("Logradouro invalido, por favor digite nome completo do logradouro e seu tipo")
+            else:
+                os.system('cls')
+                logradouro = " ".join(logradouro)
+                break
+        numero_casa = input("Digite o numero da sua casa: \n")
+        bairro = input("Digite o nome do seu bairro: \n")
+        cidade = input("Digite o nome da sua cidade: \n")
+        while True:
+            estado = input("Digite a sigla do seu estado: \n")
+            if len(estado) != 2:
+                os.system('cls')
+                print("Estado Invalido, por favor digite a sigla do seu estado \n")
+            else:
+                break
+        endereco = f"{logradouro}, {numero_casa} - {bairro} - {cidade}/{estado}"
+        return endereco
+
+    @staticmethod
+    def teste_nome():
+        while True:    
+            nome = input("Digite o seu nome completo: \n")
+            os.system('cls')
+            nome = nome.strip()
+            nome = nome.split(" ")
+            if len(nome) < 2:
+                os.system('cls')
+                print("Nome invalido, por favor digite seu nome completo, não apenas o primeiro nome")
+            else:
+                os.system('cls')
+                nome = " ".join(nome)
+                return nome
+            
+    @staticmethod
+    def teste_data_nascimento():
+        while True:
+            data_nascimento = input("Digite a sua data de nascimento: [xx/yy/zz] \n")
+            os.system('cls')
+            if "/" not in data_nascimento:
+                dia = data_nascimento[:2]
+                mes = data_nascimento[2:4]
+                ano = data_nascimento[4:]
+                data_nascimento = "/".join([dia, mes, ano])
+            data_nascimento = data_nascimento.split("/")
+            c = 0
+            if len(data_nascimento) == 3: 
                 if len(data_nascimento[0]) <= 2:
                     c += 1
                     data_nascimento[0] = str(data_nascimento[0]).zfill(2)
                 else:
                     print("Erro dia")
-            if int(data_nascimento[1]) > 0 and int(data_nascimento[1]) <= 12:
                 if len(data_nascimento[1]) <= 2:
                     c += 1
                     data_nascimento[1] = str(data_nascimento[1]).zfill(2)   
-            if len(data_nascimento[2]) == 2:
-                c += 1
-            elif len(data_nascimento[2]) == 4:
-                data_nascimento[2] = data_nascimento[2][2:]
-                c += 1
-            if c == 3:
-                data_nascimento = "/".join(data_nascimento)
-                return data_nascimento
-            else:
-                os.system('cls')
-                print("Data de nascimento invalida, informe dia, mês e ano \n")
-
-def verificar_cpf(cpf):
-    contador = 0
-    if contas:  # Checa se 'contas' não está vazio
-        for conta_info in contas.values():  # Itera sobre cada lista de contas
-            for item in conta_info:  # Itera sobre cada lista dentro de conta_info
-                if len(item) > 1:  # Verifica se existe mais de um dicionário na lista
-                    dados = item[1]  # Acessa o dicionário com os dados do usuário
-                    if dados['CPF'] == cpf:  # Verifica se o CPF é o mesmo
-                        contador += 1
-    return contador
-
-def f_endereco():
-    logradouro = input("Digite o nome da sua rua: \n")
-    numero_casa = input("Digite o numero da sua casa: \n")
-    bairro = input("Digite o nome do seu bairro: \n")
-    cidade = input("Digite o nome da sua cidade: \n")
-    while True:
-        estado = input("Digite a sigla do seu estado: \n")
-        if len(estado) != 2:
-            os.system('cls')
-            print("Estado Invalido, por favor digite a sigla do seu estado \n")
-        else:
-            break
-    endereco = f"{logradouro}, {numero_casa} - {bairro} - {cidade}/{estado}"
-    return endereco
-
-def cadastrousuario(numero_usuario, cpfs, usuario, dicionario_usu, data):
-    os.system('cls')
-    c = 1
-    while True:
-        if c == 1 or c == 10:
-            nome = teste_nome()
-            c += 1
-        if c == 2 or c == 20:
-            data_nascimento = teste_nascimento()
-            c += 1
-        if c == 3 or c == 30:
-            while True:
-                cpf = teste_cpf()
-                if cpf in cpfs:
-                    print("  Numero CPF já cadastrado ")
-                    while True:
-                        print("""                   
-                              ------------------------------
-
-                                Digite a operação desejada:
-
-                               1 - Utilizar outro CPF
-                               2 - Sair
-                      
-                              ------------------------------
-                            """)
-                        respf = int(input(" "))
-                        if respf == 1:
-                            break
-                        elif respf == 2:
-                            return numero_usuario, cpfs, usuario, dicionario_usu
-                        else:
-                            print("       Opção invalida      ")
+                if len(data_nascimento[2]) == 2:
+                    if int(data_nascimento[2]) > 20:
+                        data_nascimento[2] = "19" + data_nascimento[2]
+                    else:
+                        data_nascimento[2] = "20" + data_nascimento[2]
+                    c += 1
+                elif len(data_nascimento[2]) == 4:
+                    data_nascimento[2] = data_nascimento[2][2:]
+                    c += 1
+                if c == 3:
+                    data_nascimento = "/".join(data_nascimento)
+                    try:
+                        datetime.datetime.strptime(data_nascimento, "%d/%m/%Y")
+                        return data_nascimento
+                    except ValueError:
+                        os.system('cls')
+                        print("Data de nascimento invalida, informe dia, mês e ano validos \n")
                 else:
-                    c += 1  
-                    break
-        if c == 4 or c == 40:
-            endereco = f_endereco()
-            dicionario_usu.append({
-                "Nome": nome,
-                "Data de Nascimento": data_nascimento,
-                "CPF": cpf,
-                "Endereço": endereco
-            })
-            c += 1
-        teste = True
-        while teste:
-            cadastro = dicionario_usu[numero_usuario]
+                    os.system('cls')
+                    print("Data de nascimento invalida, informe dia, mês e ano \n")
+                    
+    @staticmethod
+    def teste_usuario_cpf():
+        i = True
+        while i:
+            cpf = teste_cpf()
+            i, cpf = Usuario.verificar_cpf_usuario(cpf)
+        return cpf
+            
+    def sair(self):
+        Usuario.usuarios_cadastrados.remove(self)
+                
+    @staticmethod
+    def verificar_cpf_usuario(cpf):
+        for usuario in Usuario.usuarios_cadastrados:
+            if usuario.cpf == cpf:
+                print("  Numero CPF já cadastrado ")
+                while True:
+                    print("""                   
+                          ------------------------------
+
+                            Digite a operação desejada:
+
+                           1 - Utilizar outro CPF
+                           2 - Sair
+                      
+                          ------------------------------
+                        """)
+                    respf = int(input(" "))
+                    if respf == 1:
+                        return True, cpf
+                    elif respf == 2:
+                        return False, None
+                    else:
+                        os.system('cls')
+                        print("       Opção invalida      ")
+            else:
+                return False, cpf 
+        
+    
+    @staticmethod
+    def mostrar_cadastro(nome, data_nascimento, cpf, endereco):
+        while True:
             max_width = 40
             print(f"""
-                  ----------------------- Dados Cadastrais -----------------------
+                    ----------------------- Dados Cadastrais -----------------------
 
-                    Nome:              {cadastro["Nome"].rjust(max_width)}
+                        Nome:              {nome.rjust(max_width)}
 
-                    Data de Nascimento:{cadastro["Data de Nascimento"].rjust(max_width)} 
+                        Data de Nascimento:{data_nascimento.rjust(max_width)} 
 
-                    CPF:               {str(cadastro["CPF"]).rjust(max_width)}
+                        CPF:               {cpf.rjust(max_width)}
 
-                    Endereço: {cadastro["Endereço"].rjust(max_width)}
+                        Endereço: {endereco.rjust(max_width)}
 
-                  ----------------------------------------------------------------
+                    ----------------------------------------------------------------
 
-                             Deseja realizar alguma alteração? [S/N]
+                                Deseja realizar alguma alteração? [S/N]
 
-                """)
+                    """)
             resp = input()
             resp = testar_resp(resp)
             if resp == "N":
-                loop = False
-                break
+                return 1
             if resp == "S":
-                loop = True
                 while True:
-                    tela_alterar_dados(data)
+                    Usuario.tela_alterar_dados()
                     operacao = teste_operacao()
                     if operacao == 1:
-                        c = 10
-                        teste = False
-                        break
+                        return 10
                     elif operacao == 2:
-                        c = 20
-                        teste = False
-                        break
+                        return 20
                     elif operacao == 3:
-                        c = 30
-                        teste = False
-                        break
+                        return 30
                     elif operacao == 4:
-                        c = 40
-                        teste = False
-                        break
+                        return 40
                     elif operacao == 5:
-                        teste = False
-                        break
+                        return None
                     else:
                         os.system('cls')
                         print("Operação invalida")
-            else:
+       
+    def cadastro(self):
+        while True:
+            c = 0
+            if c == 0 or c == 30:
+                self.cpf = Usuario.teste_usuario_cpf()
+                if self.cpf is None:
+                    self.sair()
+                    return
+            if c == 0 or c == 10:
+                self.nome = Usuario.teste_nome() 
+            if c == 0 or c == 20:
+                self.data_nascimento = Usuario.teste_data_nascimento() 
+            if c == 0 or c == 40:
+                self.endereco = Usuario.teste_endereco()
+            c = Usuario.mostrar_cadastro(self.nome, self.data_nascimento, self.cpf, self.endereco)
+            if c == 1:
+                global contador_usuarios
+                contador_usuarios += 1
+                return self
+            if c is None:
                 os.system('cls')
-                print("Resposta invalida")
-        os.system('cls')
-        if loop == False:
-            break
-    usuario.insert(numero_usuario, dicionario_usu[numero_usuario])  # Adiciona o dicionário no index numero_usuario
-    numero_usuario += 1
-    cpfs.append(cpf)
-    return numero_usuario, cpfs, usuario, dicionario_usu
+                telafinal()
+                self.sair()
+                return
 
-def achar_index(usuario, cpf):
-    indices = [i for i, dicionario in enumerate(usuario) if 'CPF' in dicionario and dicionario['CPF'] == cpf]
-    return indices[0] if indices else None
-
-def testar_resp(resp):
-    if len(resp) > 0:
-        resp = resp.strip().capitalize()
-        return resp[0]
-    else:
-        return "f"
-
-def indiceg(conta):
-    return conta - 10000
-
-def nova_conta(agencia, numero_conta, contas, cpfs, data_atual, usuario, dicionario_usu): 
-
-    "Esta função serve para criar uma nova conta para um usuario, o mesmo usuario, pode ter varias contas"
-
-    os.system('cls')
-    print(f"""
+class Conta:
+    
+    def __init__(self, numero_conta):
+        self.numero_conta = numero_conta
+        self.agencia = "0001"
+        self.usuario = None
+        self.senha = None
+        self.n_tentativa_senha = 0
+        self.data_primeira_operacao = datetime.date.today()
+        self.n_saque_diario = 0
+        self.n_operacoes_diario = 0
+        self.extratos = {}
+        self.saque = 0
+        self.deposito = 0
+        self.saldo = 0
+    
+    def testar_data(self):
+        if self.data_primeira_operacao != datetime.date.today():
+            self.n_saque_diario = 0
+            self.n_operacoes_diario = 0
+            self.data_primeira_operacao = datetime.date.today()
+            return self
+       
+    @staticmethod
+    def tela_cadastro_conta():
+         print(f"""
               --------------------------------------------
                    Cadastros de nova conta corrente
               --------------------------------------------
           """)
-    cpf = teste_cpf()
-    if cpf in cpfs:
-        indice_usu = achar_index(usuario, cpf)
-        if indice_usu is not None:
-            nome = usuario[indice_usu]['Nome'].split()[0]
-            nome_completo = usuario[indice_usu]['Nome']
-            contador = 0
-            contador = verificar_cpf(cpf)
+         
+    @staticmethod
+    def adicionar_conta(cpf, numero_conta):
+        if cpf in conta:
+            conta[cpf].append(numero_conta)  # Adiciona o novo CPF à lista
+        else:
+            conta.update({cpf : [numero_conta]}) # Adiciona um novo dicionario em contas, com o CPF como chave, e uma lista de contas daquele CPF como valor
+            
+    @staticmethod
+    def contas_cpf(cpf):
+        if cpf in contas:
+            contador = len(contas.get(cpf, []))
+            return contador
+        
+    @staticmethod
+    def achar_nome(cpf):
+        for usuario in usuarios:
+            if usuario.cpf == cpf:
+                nome = usuario.nome.split()[0]
+                return nome
+            
+    @staticmethod
+    def achar_nome_completo(cpf):
+        for usuario in usuarios:
+            if usuario.cpf == cpf:
+                nome = usuario.nome
+                return nome
+       
+    @staticmethod
+    def achar_usuarios(cpf):
+        for usuario in usuarios:
+            if usuario.cpf == cpf:
+                return usuario   
+       
+    @staticmethod
+    def nova_conta():
+        os.system('cls')
+        Conta.tela_cadastro_conta()
+        cpf = teste_cpf()
+        if cpf in cpfs:
+            nome = Conta.achar_nome(cpf)
+            nome_completo = Conta.achar_nome_completo(cpf)
+            contador = Conta.contas_cpf(cpf)
             while True:
                 print(f"""
+            
                                             Olá {nome}!!!
-                             Você possui {contador} contas cadastradas em seu CPF
-                                   Deseja cadastrar outra nova? [S/N] 
-                      """)
+                            Você possui {contador} contas cadastradas em seu CPF
+                                 Deseja cadastrar outra nova? [S/N] 
+            
+                    """)
                 resp = input(" ")
                 resp = testar_resp(resp)
                 os.system('cls')
                 if resp == "S":
-                    numero_conta += 1
-                    if numero_conta not in contas:
-                        contas[numero_conta] = []  # Inicializa a lista se não existir
-                    contas[numero_conta].append(dicionario_usu)  # Adiciona a nova conta à lista
+                    numero_conta = numero_contas()
+                    Conta.adicionar_conta(cpf)
                     print(f"""
                                 -----------------------------------------------
 
-                                     Parabéns, você acaba de criar sua nova
+                                    Parabéns, você acaba de criar sua nova
                                                 conta corrente
-                      
-                      
-                                   Agência:         {agencia}
-                                   Conta corrente: {numero_conta} 
-                                   Nome:  {nome_completo}
+                        
+                        
+                                Agência:         {Conta.agencia}
+                                Conta corrente: {numero_conta} 
+                                Nome:  {nome_completo}
 
 
-                                          {(data_atual.strftime(formatador))}
+                                        {(data_atual.strftime(formatador))}
 
-                                -----------------------------------------------
-                              """)
-                    indice = indiceg(numero_conta)
-                    extratos.insert(indice, {})
-                    num_ope.insert(indice, 0)
-                    dataprimeiraope.insert(indice, data_atual)
-                    saldo.insert(indice, 0)
-                    n.insert(indice, 0)   
-                    return contas, numero_conta
+                                    -----------------------------------------------
+                            """)   
+                    return numero_conta, cpf
                 elif resp == "N":
-                    return contas, numero_conta
+                    return None, None
                 else:
                     os.system('cls')
                     print("Resposta invalida \n\n")
         else:
             print("CPF não cadastrado")
-            if not contas:
-                contas = {}
-            return contas, numero_conta
-    else:
-        print("CPF não cadastrado")
-    if not contas:
-        contas = {}
-    return contas, numero_conta
+            return None, None           
+         
+    @staticmethod
+    def telainicio():
+        print(f"""
+        --------------Bem vindo ao seu Banco--------------
+            
+                        {(data_atual.strftime(formatador))}
 
-def sacar(valor, extratos, saldo, n, data, num_ope, dataprimeiraope):
-    if saldo >= valor:
-        n += 1
-        if n <= 3:
-            num_ope += 1
-            if num_ope == 1:
-                dataprimeiraope = datetime.date.today()
-            saldo -= valor
-            print(f"Operação diária {num_ope}")
-            print(f"O seu {n}º saque diário de {valor:.2f} foi feito")
-            extratos.update({f"Operação {num_ope}  Saque    ": f"- R${valor:.2f} em {data.strftime(formatador)}"})
+            Por favor digite a operação desejada:
+
+        1 - Saque
+        2 - Deposito
+        3 - Extrato
+        4 - Sair
+
+        --------------------------------------------------
+        """)     
+    
+    @staticmethod
+    def criar_senha():
+        print("""
+              ---------------------------------------------------
+              
+              Agora precisamos criar umas senha para a sua conta
+              
+              ---------------------------------------------------
+              """)
+        senha = Conta.teste_senha()
+        return senha
+               
+    def cadastro_nova_conta(self):
+        self.numero_conta, cpf = Conta.nova_conta()
+        if self.numero_conta is None:
+            cancelar_numero_contas()
+            return
+        self.senha = Conta.criar_senha()
+        self.usuario = Conta.achar_usuarios(cpf)
+        global contador_contas
+        contador_contas += 1
+        return self
+        
+    def sacar(self, valor):
+        if self.saldo >= valor:
+            Conta.testar_data()
+            self.n_saque_diario += 1
+            if self.n_saque_diario <= 3:
+                self.n_operacoes_diario += 1
+                self.saldo -= valor
+                print(f"Operação diária {self.n_operacoes_diario}")
+                print(f"O seu {self.n_saque_diario}º saque diário de R${valor:.2f} foi feito")
+                data = datetime.datetime.now()
+                self.extratos.update({f"Operação {self.n_operacoes_diario}  Saque    ": f"- R${valor:.2f} em {data.strftime(formatador)}"})
+            else:
+                print("Você ultrapassou o limite de saques diários")
         else:
-            print("Você ultrapassou o limite de saques diários")
-    else:
-        print("Saldo insuficiente")
-    return extratos, saldo, n, num_ope, dataprimeiraope
+            print("Saldo insuficiente")
+            
+    def depositar(self, valor):
+        Conta.testar_data()
+        self.n_operacoes_diario += 1
+        self.saldo += valor
+        print(f"Operação diária {self.n_operacoes_diario}")
+        print(f"Depósito no valor de R${valor:.2f} realizado")
+        data = datetime.datetime.now()
+        self.extratos.update({f"Operação {self.n_operacoes_diario}  Deposito ": f"  R${valor} em {data.strftime(formatador)}"})
+        
+    def extrato(self):
+        largura = 35
+        data = datetime.datetime.now()
+        print("-------------------------Extrato-------------------------")
+        print("")
+        print(f"                   {(data.strftime(formatador))}")
+        print("")
+        for chave, valor in self.extratos.items():
+            print(f'{chave:<{largura - 15}}: {valor:10}')
+        tela = "Saldo total"
+        saldos = f"   R${self.saldo:.2f}"
+        print("")
+        print("")
+        print(f'{tela:<{largura - 14}}:{saldos:10}')
+        print("")
+        print("---------------------------------------------------------")
+        
+    def operacoes(self):
+        while True:
+            Conta.telainicio(data_atual)
+            operacao = teste_operacao()
+            os.system('cls')
+            if operacao != 4:
+                if self.n_operacoes_diario <= 10 or operacao == 3 or operacao == 4:
+                    if operacao == 1:
+                        valor = float(input("Digite o valor que deseja sacar: \nR$"))
+                        Conta.sacar(valor)
+                    elif operacao == 2:
+                        valor = float(input("Digite o valor que deseja depositar: \nR$"))
+                        Conta.depositar(valor)
+                    elif operacao == 3:
+                        Conta.extrato()
+                    elif operacao == 4:
+                        return
+                    else:
+                        print("Operação inválida \n")
+                        resp = input("Deseja realizar outra operação: [S/N] \n")
+                        resp = testar_resp(resp)
+                        os.system('cls')
 
-def depositar(valor, extratos, saldo, data, num_ope, dataprimeiraope):
-    num_ope += 1
-    if num_ope == 1:
-        dataprimeiraope = datetime.date.today()
-    saldo += valor
-    print(f"Operação diária {num_ope}")
-    print(f"Depósito no valor de {valor:.2f} realizado")
-    extratos.update({f"Operação {num_ope}  Deposito ": f"  R${valor} em {data.strftime(formatador)}"})
-    return extratos, saldo, num_ope, dataprimeiraope
+                else:
+                    print("""
+                        ---------------------------------------
+                                                        
+                        Limite de operações diarias atingido: 
+                                Por favor volte outro dia       
+                                                            
+                        ---------------------------------------
+                        """)
+                    resp = input("\n Deseja realizar outra operação: [S/N] \n")
+                    if resp.upper() == "S":
+                        continue
+                    elif resp.upper() == "N":
+                        telafinal()
+                        return
+                    else:
+                        print("Opção invalida")
+            else:
+                telafinal()
+                return
+            
+    @staticmethod
+    def login():
+        while True:
+            try:
+                numero_conta = int(input("Digite o numero da conta que deseja acessar: \n"))
+                break
+            except ValueError:
+                os.system('cls')
+                print("Numero de conta invalido, por favor digite um numero valido")
+        for conta in contas:
+            if conta.numero_conta == numero_conta:
+                senha = Conta.teste_senha()
+                if conta.n_tentativa_senha <= 3:
+                    if conta.senha == senha:
+                        return conta
+                    else:
+                        os.system('cls')
+                        conta.n_tentativa_senha += 1
+                        print("Senha invalida \n")
+                else:
+                    print("""
+                          -------------------------------
+                          
+                           Limite de tentativa atingidos
+                          
+                          Por favor consulte seu gerente
+                          
+                          -------------------------------
+                          """)
+                    return None
+        print("Numero de conta nao encontrado!")
+        return None
+    
+    @staticmethod
+    def teste_senha():
+        while True:
+            senha = getpass.getpass("Digite a sua senha: (Apenas 6 numeros)\n")
+            if len(senha) == 6:
+                if senha.isdigit():
+                    senha = int(senha)
+                    return senha
+                else:
+                    os.system('cls')
+                    print("Senha invalida, a sua senha deve possuir apenas numeros")
+            else:
+                os.system('cls')
+                print("Senha invalida, a sua senha deve possuir 6 numeros")
+    
+usuarios = []  
+contas = []
+contador_usuarios = 0
+contador_contas = 0
 
-def extrato(extratos, saldo, data):
-    largura = 35
-    print("-------------------------Extrato-------------------------")
-    print("")
-    print(f"                   {(data.strftime(formatador))}")
-    print("")
-    for chave, valor in extratos.items():
-        print(f'{chave:<{largura - 15}}: {valor:10}')
-    tela = "Saldo total"
-    saldos = f"   R${saldo:.2f}"
-    print("")
-    print("")
-    print(f'{tela:<{largura - 14}}:{saldos:10}')
-    print("")
-    print("-------------------------------------------------------")
-
-def telainicial(data):
-    print(f"""
-    --------------Bem vindo ao seu Banco--------------
-          
-                    {(data.strftime(formatador))}
-
-           Por favor digite a operação desejada:
-
-      1 - Cadastrar novo usuario
-      2 - Cadastrar nova conta
-      3 - Operações
-      4 - Sair
-
-    --------------------------------------------------
-      """)
-
-def tela_alterar_dados(data):
-    print(f"""
-    -----------------Bem vindo ao seu Banco-----------------
-          
-                      {(data.strftime(formatador))}
-
-    Por favor digite o numero do dado que deseja modificar:
-
-      1 - Nome
-      2 - Data de Nascimento
-      3 - CPF
-      4 - Endereço
-      5 - Sair
-
-    --------------------------------------------------------
-      """)
-
-def telainicio(data):
-    print(f"""
-    --------------Bem vindo ao seu Banco--------------
-          
-                    {(data.strftime(formatador))}
-
-           Por favor digite a operação desejada:
-
-      1 - Saque
-      2 - Deposito
-      3 - Extrato
-      4 - Sair
-
-    --------------------------------------------------
-      """)
-
-def telafinal():
-    print(f"""
-          Obrigado por utilizar o nosso Banco
-                   Volte Sempre!!!
-          """)
-
-# Variáveis globais
-extratos = []
-dicionario_usu = []
-usuario = []
-cpfs = []
-n = []
-contas = {}
-num_ope = []  
-saldo = []
-numero_usuario = 1
-agencia = "0001"
-dataprimeiraope = []
-
-numero_conta = 9999
-dicionario_usu.append({"CPF" : 0})
 while True:
-    data_atual = datetime.datetime.now()
     telainicial(data_atual)
     operacao = teste_operacao()
     if operacao == 1:
-        data_atual = datetime.datetime.now()
-        numero_usuario, cpfs, usuario, dicionario_usu = cadastrousuario(numero_usuario, cpfs, usuario, dicionario_usu, data_atual)
+        while True:
+            if len(usuarios) <= contador_usuarios:
+                usuarios.append(None)
+            else:
+                break
+        usuarios.insert(contador_usuarios, Usuario.cadastro())
     elif operacao == 2:
-        data_atual = datetime.datetime.now()
-        contas, numero_conta = nova_conta(agencia, numero_conta, contas, cpfs, data_atual, usuario, dicionario_usu)
+        while True:
+            if len(contas) <= contador_contas:
+                contas.append(None)
+            else:
+                break
+        contas.insert(contador_contas, Conta.cadastro())
     elif operacao == 3:
-        conta_usu = int(input("Digite o numero de sua conta: \n"))
-        if conta_usu in contas: 
-            indice = indiceg(conta_usu)
-            dataatual = datetime.date.today()
-            if num_ope[indice] >= 1:
-                if dataprimeiraope[indice] != dataatual:
-                    num_ope[indice] = 0
-                    n[indice] = 0   
-            while True:
-                data_atual = datetime.datetime.now()
-                telainicio(data_atual)
-                operacao = teste_operacao()
-                os.system('cls')
-                if num_ope[indice] < 10:  # Verifica se o número de operações é menor que 10
-                    if operacao == 1:
-                        data_atual = datetime.datetime.now()
-                        valor = float(input("Digite o valor que deseja sacar: \nR$"))
-                        extratos[indice], saldo[indice], n[indice], num_ope[indice], dataprimeiraope[indice] = sacar(valor, extratos[indice], saldo[indice], n[indice], data_atual, num_ope[indice], dataprimeiraope[indice])
-                    elif operacao == 2:
-                        data_atual = datetime.datetime.now()
-                        valor = float(input("Digite o valor que deseja depositar: \nR$"))
-                        extratos[indice], saldo[indice], num_ope[indice], dataprimeiraope[indice] = depositar(valor, extratos[indice], saldo[indice], data_atual, num_ope[indice], dataprimeiraope[indice])
-                    elif operacao == 3:
-                        data_atual = datetime.datetime.now()
-                        extrato(extratos[indice], saldo[indice], data_atual)
-                    elif operacao == 4:
-                        break
-                    else:
-                        print("Operação inválida")
-                    print("")
-                    resp = input("Deseja realizar outra operação: [S/N] \n")
-                    resp = testar_resp(resp)
-                    os.system('cls')
-                else:
-                    if operacao == 3:
-                        extrato(extratos,saldo, data_atual)
-                    else:
-                        print("""
-                               ---------------------------------------
-                                                         
-                               Limite de operações diarias atingido: 
-                                     Por favor volte outro dia       
-                                                         
-                               ---------------------------------------
-                              """)
-                    resp = "N"
-                if resp.upper() == "S":
-                    continue
-                elif resp.upper() == "N":
-                    telafinal()
-                    break
-                else:
-                    print("     Opção invalida")
-        else:
-            os.system('cls')
-            print("Conta inexistente")
+        conta_operacao = Conta.login()
+        if conta_operacao is not None:
+            Conta.operacoes()
     elif operacao == 4:
         telafinal()
         break
     else:
         os.system('cls')
-        print("                    Operação invalida\n")
- 
+        print("Operação Invalida \n Por favor digite uma operação valida:")
