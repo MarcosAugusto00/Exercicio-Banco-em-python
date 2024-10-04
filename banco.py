@@ -598,7 +598,7 @@ while True:
                 contas.append(None)
             else:
                 break
-        contas.insert(contador_contas, Conta.cadastro())
+        contas.insert(contador_contas, Conta.cadastro_nova_conta())
     elif operacao == 3:
         conta_operacao = Conta.login()
         if conta_operacao is not None:
