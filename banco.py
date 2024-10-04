@@ -75,16 +75,15 @@ class Usuario:
     
     usuarios_cadastrados = []
     
-    def __init__(self, nome, data_nascimento, endereco, cpf):
-        self.nome = nome
-        self.data_nascimento = data_nascimento
-        self.endereco = endereco
-        self.cpf = cpf
-        cpfs.append(self.cpf)
+    def __init__(self):
+        self.nome = None
+        self.data_nascimento = None
+        self.endereco = None
+        self.cpf = None
         Usuario.usuarios_cadastrados.append(self)
      
     @staticmethod
-    def tela_alterar_dados(data):
+    def tela_alterar_dados():
         print(f"""
         -----------------Bem vindo ao seu Banco-----------------
             
@@ -103,6 +102,7 @@ class Usuario:
             
     @staticmethod
     def teste_endereco():
+        os.system('cls')
         while True:
             logradouro = input("Digite o nome da sua rua: \n")
             logradouro = logradouro.strip()
@@ -129,6 +129,7 @@ class Usuario:
 
     @staticmethod
     def teste_nome():
+        os.system('cls')
         while True:    
             nome = input("Digite o seu nome completo: \n")
             os.system('cls')
@@ -170,7 +171,7 @@ class Usuario:
                         data_nascimento[2] = "20" + data_nascimento[2]
                     c += 1
                 elif len(data_nascimento[2]) == 4:
-                    data_nascimento[2] = data_nascimento[2][2:]
+                    data_nascimento[2] = data_nascimento[2]
                     c += 1
                 if c == 3:
                     data_nascimento = "/".join(data_nascimento)
@@ -182,7 +183,7 @@ class Usuario:
                         print("Data de nascimento invalida, informe dia, mês e ano validos \n")
                 else:
                     os.system('cls')
-                    print("Data de nascimento invalida, informe dia, mês e ano \n")
+                    print("Data de nascimento invalida, informe dia, mês e ano a \n")
                     
     @staticmethod
     def teste_usuario_cpf():
@@ -234,7 +235,7 @@ class Usuario:
 
                         Data de Nascimento:{data_nascimento.rjust(max_width)} 
 
-                        CPF:               {cpf.rjust(max_width)}
+                        CPF:               {str(cpf).rjust(max_width)}
 
                         Endereço: {endereco.rjust(max_width)}
 
@@ -266,8 +267,8 @@ class Usuario:
                         print("Operação invalida")
        
     def cadastro(self):
+        c = 0
         while True:
-            c = 0
             if c == 0 or c == 30:
                 self.cpf = Usuario.teste_usuario_cpf()
                 if self.cpf is None:
@@ -281,6 +282,7 @@ class Usuario:
                 self.endereco = Usuario.teste_endereco()
             c = Usuario.mostrar_cadastro(self.nome, self.data_nascimento, self.cpf, self.endereco)
             if c == 1:
+                cpfs.append(self.cpf)
                 global contador_usuarios
                 contador_usuarios += 1
                 return self
@@ -292,12 +294,12 @@ class Usuario:
 
 class Conta:
     
-    def __init__(self, numero_conta):
-        self.numero_conta = numero_conta
+    def __init__(self):
+        self.numero_conta = None
         self.agencia = "0001"
         self.usuario = None
         self.senha = None
-        self.n_tentativa_senha = 0
+        self.n_tentativa_senha = 3
         self.data_primeira_operacao = datetime.date.today()
         self.n_saque_diario = 0
         self.n_operacoes_diario = 0
@@ -330,28 +332,30 @@ class Conta:
             
     @staticmethod
     def contas_cpf(cpf):
-        if cpf in contas:
-            contador = len(contas.get(cpf, []))
+        if cpf in conta:
+            contador = len(conta[cpf])
             return contador
+        else:
+            return 0
         
     @staticmethod
     def achar_nome(cpf):
         for usuario in usuarios:
-            if usuario.cpf == cpf:
+            if usuario is not None and usuario.cpf == cpf:
                 nome = usuario.nome.split()[0]
                 return nome
             
     @staticmethod
     def achar_nome_completo(cpf):
         for usuario in usuarios:
-            if usuario.cpf == cpf:
+            if usuario is not None and usuario.cpf == cpf:
                 nome = usuario.nome
                 return nome
        
     @staticmethod
     def achar_usuarios(cpf):
         for usuario in usuarios:
-            if usuario.cpf == cpf:
+            if usuario is not None and usuario.cpf == cpf:
                 return usuario   
        
     @staticmethod
@@ -376,7 +380,7 @@ class Conta:
                 os.system('cls')
                 if resp == "S":
                     numero_conta = numero_contas()
-                    Conta.adicionar_conta(cpf)
+                    Conta.adicionar_conta(cpf, numero_conta)
                     print(f"""
                                 -----------------------------------------------
 
@@ -384,14 +388,14 @@ class Conta:
                                                 conta corrente
                         
                         
-                                Agência:         {Conta.agencia}
+                                Agência:         {nova_conta.agencia}
                                 Conta corrente: {numero_conta} 
                                 Nome:  {nome_completo}
 
 
                                         {(data_atual.strftime(formatador))}
 
-                                    -----------------------------------------------
+                                -----------------------------------------------
                             """)   
                     return numero_conta, cpf
                 elif resp == "N":
@@ -422,16 +426,33 @@ class Conta:
     
     @staticmethod
     def criar_senha():
-        print("""
-              ---------------------------------------------------
-              
-              Agora precisamos criar umas senha para a sua conta
-              
-              ---------------------------------------------------
-              """)
-        senha = Conta.teste_senha()
-        return senha
-               
+        while True:
+            print("""
+                            ---------------------------------------------------
+                
+                            Agora precisamos criar umas senha para a sua conta
+                
+                            ---------------------------------------------------
+                """)
+            senha = Conta.teste_senha()
+            senha = Conta.validar_senha(senha)
+            if senha is not None:
+                return senha
+    
+    def validar_senha(senha):
+        validar_senha = getpass.getpass("Confirme a sua senha: (Apenas 6 numeros) \n")
+        if len(validar_senha) == 6:
+            if validar_senha.isdigit():
+                validar_senha = int(validar_senha)
+                if senha == validar_senha:
+                    return validar_senha
+            else:
+                print("As senhas nao conhecidem")
+                return None
+        else:
+            print("As senhas nao conhecidem")
+            return None
+                    
     def cadastro_nova_conta(self):
         self.numero_conta, cpf = Conta.nova_conta()
         if self.numero_conta is None:
@@ -443,9 +464,10 @@ class Conta:
         contador_contas += 1
         return self
         
-    def sacar(self, valor):
+    def sacar(self):
+        valor = float(input("Digite o valor que deseja sacar: \nR$"))
         if self.saldo >= valor:
-            Conta.testar_data()
+            self.testar_data()
             self.n_saque_diario += 1
             if self.n_saque_diario <= 3:
                 self.n_operacoes_diario += 1
@@ -459,14 +481,15 @@ class Conta:
         else:
             print("Saldo insuficiente")
             
-    def depositar(self, valor):
-        Conta.testar_data()
+    def depositar(self):
+        self.testar_data()
+        valor = float(input("Digite o valor que deseja depositar: \nR$"))
         self.n_operacoes_diario += 1
         self.saldo += valor
         print(f"Operação diária {self.n_operacoes_diario}")
         print(f"Depósito no valor de R${valor:.2f} realizado")
         data = datetime.datetime.now()
-        self.extratos.update({f"Operação {self.n_operacoes_diario}  Deposito ": f"  R${valor} em {data.strftime(formatador)}"})
+        self.extratos.update({f"Operação {self.n_operacoes_diario}  Deposito ": f"  R${valor:.2f} em {data.strftime(formatador)}"})
         
     def extrato(self):
         largura = 35
@@ -487,19 +510,17 @@ class Conta:
         
     def operacoes(self):
         while True:
-            Conta.telainicio(data_atual)
+            Conta.telainicio()
             operacao = teste_operacao()
             os.system('cls')
             if operacao != 4:
                 if self.n_operacoes_diario <= 10 or operacao == 3 or operacao == 4:
                     if operacao == 1:
-                        valor = float(input("Digite o valor que deseja sacar: \nR$"))
-                        Conta.sacar(valor)
+                        self.sacar()
                     elif operacao == 2:
-                        valor = float(input("Digite o valor que deseja depositar: \nR$"))
-                        Conta.depositar(valor)
+                        self.depositar()
                     elif operacao == 3:
-                        Conta.extrato()
+                        self.extrato()
                     elif operacao == 4:
                         return
                     else:
@@ -538,27 +559,32 @@ class Conta:
             except ValueError:
                 os.system('cls')
                 print("Numero de conta invalido, por favor digite um numero valido")
-        for conta in contas:
-            if conta.numero_conta == numero_conta:
-                senha = Conta.teste_senha()
-                if conta.n_tentativa_senha <= 3:
-                    if conta.senha == senha:
-                        return conta
+        for conta_usu in contas:
+            if conta_usu is not None and conta_usu.numero_conta == numero_conta:
+                while True:
+                    senha = conta_usu.teste_senha()
+                    if conta_usu.n_tentativa_senha > 0:
+                        if conta_usu.senha == senha:
+                            os.system('cls')
+                            conta_usu.n_tentativa_senha = 3
+                            return conta_usu
+                        else:
+                            os.system('cls')
+                            conta_usu.n_tentativa_senha -= 1
+                            print("Senha invalida \n")
+                            print(f"Restam {conta_usu.n_tentativa_senha} tentativas")
                     else:
-                        os.system('cls')
-                        conta.n_tentativa_senha += 1
-                        print("Senha invalida \n")
-                else:
-                    print("""
-                          -------------------------------
-                          
-                           Limite de tentativa atingidos
-                          
-                          Por favor consulte seu gerente
-                          
-                          -------------------------------
-                          """)
-                    return None
+                        print("""
+                            -------------------------------
+                                
+                            Limite de tentativa atingidos
+                                
+                            Por favor consulte seu gerente
+                                
+                            -------------------------------
+                            """)
+                        return None
+        os.system('cls')    
         print("Numero de conta nao encontrado!")
         return None
     
@@ -591,18 +617,22 @@ while True:
                 usuarios.append(None)
             else:
                 break
-        usuarios.insert(contador_usuarios, Usuario.cadastro())
+        novo_usuario = Usuario()
+        novo_usuario.cadastro()
+        usuarios.insert(contador_usuarios, novo_usuario)
     elif operacao == 2:
         while True:
             if len(contas) <= contador_contas:
                 contas.append(None)
             else:
                 break
-        contas.insert(contador_contas, Conta.cadastro_nova_conta())
+        nova_conta = Conta()
+        nova_conta.cadastro_nova_conta()
+        contas.insert(contador_contas, nova_conta)
     elif operacao == 3:
         conta_operacao = Conta.login()
         if conta_operacao is not None:
-            Conta.operacoes()
+            conta_operacao.operacoes()
     elif operacao == 4:
         telafinal()
         break
